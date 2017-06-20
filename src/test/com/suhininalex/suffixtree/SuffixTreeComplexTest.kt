@@ -18,12 +18,6 @@ class SuffixTreeComplexTest {
     internal var sequencesLength = 1000
     internal var sequencesRemovals = 500
 
-
-    @Test
-    fun t(){
-        estimateMemory(100000, 100)
-    }
-
     fun estimateMemory(amount: Int, length: Int){
         val tree = createTree(amount, length)
         System.gc()

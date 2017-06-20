@@ -101,9 +101,9 @@ class SuffixTree<T : Comparable<T>> {
     internal fun relabelAllParents(edge: Edge?) {
         var edge = edge
         while (edge != null && edge.parent != root) {
-            val parentEdge = edge.parent.parentEdge
-            if (parentEdge!!.sequence === edge.sequence) return
-            parentEdge!!.sequence = edge.sequence
+            val parentEdge = edge.parent.parentEdge!!
+            if (parentEdge.sequence === edge.sequence) return
+            parentEdge.sequence = edge.sequence
             parentEdge.k = (edge.k.toInt() - (parentEdge.p - parentEdge.k) - 1).toShort()
             parentEdge.p = (edge.k - 1).toShort()
             edge = parentEdge
@@ -177,4 +177,13 @@ class SuffixTree<T : Comparable<T>> {
         return root.subTreeToString()
     }
 
+    fun getAllLastSequenceNodes(id: Long): List<Node> {
+        val sequence = sequences[id] ?: throw IllegalArgumentException("There are no such sequence!")
+        val nodes = LinkedList<Node>()
+
+        for (i in 0..sequence.size - 1 - 1) {
+            nodes.add(canonize(root, sequence, i, sequence.size - 2).first!!)
+        }
+        return nodes
+    }
 }
