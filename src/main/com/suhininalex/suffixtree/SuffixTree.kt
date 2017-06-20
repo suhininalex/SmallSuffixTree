@@ -177,14 +177,4 @@ class SuffixTree<T : Comparable<T>> {
         return root.subTreeToString()
     }
 
-    //TODO check if this rly need
-    fun getAllLastSequenceNodes(id: Long): List<Node> {
-        val sequence = sequences[id] ?: throw IllegalArgumentException("There are no such sequence!")
-        val nodes = LinkedList<Node>()
-
-        for (i in 0..sequence.size - 1 - 1) {
-            nodes.add(canonize(root, sequence, i, sequence.size - 2).first!!)
-        }
-        return nodes
-    }
 }
