@@ -88,6 +88,7 @@ internal fun <K, V> ScapeGoatTree<K, V>.remove(key: K): Unit {
     if (size < alpha*maxSize) {
         if (root != null) {
             root = Rebuild_Tree(size, root!!).first
+            maxSize = size
         }
     }
 }
@@ -228,6 +229,18 @@ internal fun <K, V> ScapeGoatTree<K, V>.insert(node: ScapeGoatNode<K, V>){
         else if (isLeft) scapeGoatParent.left = root
         else scapeGoatParent.right = root
     }
+}
+
+fun <K, V> ScapeGoatTree<K, V>.first(): V? {
+    return root?.value
+}
+
+fun <K, V> ScapeGoatTree<K, V>.isEmpty(): Boolean {
+    return root == null
+}
+
+fun <K, V> ScapeGoatTree<K, V>.containsOne(): Boolean {
+    return root != null && root?.left == null && root?.right == null
 }
 
 private fun log(value: Double, base: Double): Double =

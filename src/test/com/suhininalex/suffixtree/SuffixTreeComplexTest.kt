@@ -2,6 +2,7 @@ package com.suhininalex.suffixtree
 
 import org.junit.Test
 import java.util.*
+import kotlin.system.measureTimeMillis
 
 data class LongToken(val value: Long): Comparable<LongToken>{
 
@@ -15,8 +16,8 @@ data class LongToken(val value: Long): Comparable<LongToken>{
 
 class SuffixTreeComplexTest {
     internal var sequencesAmount = 1000
-    internal var sequencesLength = 1000
-    internal var sequencesRemovals = 500
+    internal var sequencesLength = 200
+    internal var sequencesRemovals = 800
 
     fun estimateMemory(amount: Int, length: Int){
         val tree = createTree(amount, length)
@@ -41,46 +42,47 @@ class SuffixTreeComplexTest {
         val tree = SuffixTree<LongToken>()
         val sequences = generateRandomLists(sequencesAmount, sequencesLength)
         val sequencesId = ArrayList<Long>()
-        for (sequence in sequences) {
-            val id = tree.addSequence(sequence)
-            sequencesId.add(id)
+
+        print("Adding...")
+        val additionTime = measureTimeMillis {
+            for (sequence in sequences) {
+                sequencesId += tree.addSequence(sequence)
+            }
         }
+        println("OK in $additionTime")
 
 
         print("Testing added sequences...")
         checkSequences(tree, sequences)
         println("OK")
 
-        val removedId = ArrayList<Long>()
-        val removedSequences = ArrayList<List<*>>()
-        for (i in 0..sequencesRemovals - 1) {
-            val index = getRandom(sequencesId.size)
-            removedId.add(sequencesId[index])
-            sequencesId.removeAt(index)
-            sequences.removeAt(index)
-        }
-
-        for (id in removedId) {
-            removedSequences.add(tree.sequences[id]!!)
-        }
-
+        val treeSequences = sequencesId.zip(sequences)
+        val removedIds = treeSequences.shuffle().take(sequencesRemovals).map { (id, sequence) -> id }.toSet()
 
         print("Removing...")
-        for (id in removedId) {
-            tree.removeSequence(id)
+        val removingTime = measureTimeMillis {
+            for (id in removedIds) {
+                tree.removeSequence(id)
+            }
         }
-        println("OK")
+        println("OK in $removingTime")
 
 
+        val remained = treeSequences.filter { (id, sequence) -> id !in removedIds }.map {(id, sequence) -> sequence}
         print("Check other existance...")
-        checkSequences(tree, sequences)
+        checkSequences(tree, remained)
         println("OK")
 
 
+        val removed = treeSequences.filter { (id, sequence) -> id in removedIds }.map {(id, sequence) -> sequence}
         print("Check relabelling and edges removal...")
-        for (sequence in removedSequences) {
+        for (sequence in removed) {
             assert(checkNoSequence(tree.root, sequence))
         }
+        println("OK")
+
+        print("Check no removed sequence...")
+        assert(removed.all { ! tree.checkSequence(it) })
         println("OK")
 
     }
@@ -104,7 +106,7 @@ class SuffixTreeComplexTest {
     }
 
     private fun <T: Comparable<T>> checkAllSuffixes(tree: SuffixTree<T>, sequence: List<T>): Boolean {
-        return sequence.indices.any { tree.checkSequence(sequence.subList(it, sequence.size)) }
+        return sequence.indices.all { tree.checkSequence(sequence.subList(it, sequence.size)) }
     }
 
     private fun generateRandomLists(amount: Int, length: Int): MutableList<List<LongToken>> {
@@ -125,7 +127,7 @@ class SuffixTreeComplexTest {
 
     val random = Random()
 
-    private fun randomToken(setSize: Int = 5): LongToken {
+    private fun randomToken(setSize: Int = 1000): LongToken {
         return LongToken(random.nextInt(setSize).toLong())
     }
 

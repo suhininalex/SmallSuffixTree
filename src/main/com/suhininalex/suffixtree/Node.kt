@@ -46,4 +46,9 @@ class Node internal constructor(var parentEdge: Edge?) : ScapeGoatTree<Any, Edge
     val edges: Collection<Edge>
         get() = entries().map { it.value }
 
+    val firstEdge: Edge?
+        get() = first()
+
+    fun containsOneEdge(): Boolean =
+        containsOne()
 }

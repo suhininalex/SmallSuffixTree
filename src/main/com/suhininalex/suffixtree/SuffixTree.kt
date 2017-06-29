@@ -3,7 +3,6 @@ package com.suhininalex.suffixtree
 import java.util.*
 import java.util.concurrent.atomic.AtomicLong
 
-
 class SuffixTree<T : Comparable<T>> {
 
     val root = Node(null)
@@ -114,10 +113,9 @@ class SuffixTree<T : Comparable<T>> {
         val sequence = sequences[id] ?: throw IllegalArgumentException("There are no such sequence!")
         var currentPoint: Pair<Node?, Int> = Pair(root, 0)
         do {
-            val canonized = canonize(currentPoint.first, sequence, currentPoint.second, sequence.size - 2)
-            currentPoint = removeEdge(canonized.first!!, sequence, canonized.second)
-            val edges = currentPoint.first!!.edges
-            if (!edges.isEmpty()) relabelAllParents(edges.iterator().next())
+            val (node, k) = canonize(currentPoint.first, sequence, currentPoint.second, sequence.size - 2)
+            currentPoint = removeEdge(node!!, sequence, k)
+            relabelAllParents(currentPoint.first!!.firstEdge)
             currentPoint = Pair(currentPoint.first!!.suffixLink, currentPoint.second)
         } while (currentPoint.second < sequence.size - 1 || currentPoint.first != null)
     }
@@ -125,9 +123,8 @@ class SuffixTree<T : Comparable<T>> {
     internal fun removeEdge(s: Node, sequence: List<Any>, k: Int): Pair<Node?, Int> {
         val edge = s.getEdge(sequence[k])!!
         s.removeEdge(edge)
-
-        if (s != root && s.edges.size == 1) {
-            val anotherChild = s.edges.iterator().next()
+        if (s != root && s.containsOneEdge()) {
+            val anotherChild = s.firstEdge!!
             var parentEdge = s.parentEdge!!
             parentEdge = parentEdge.setTerminal(anotherChild.terminal)
             if (anotherChild.terminal != null) anotherChild.terminal!!.parentEdge = parentEdge
