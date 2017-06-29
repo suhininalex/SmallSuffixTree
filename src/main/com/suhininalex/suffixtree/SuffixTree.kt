@@ -111,6 +111,7 @@ class SuffixTree<T : Comparable<T>> {
 
     fun removeSequence(id: Long) {
         val sequence = sequences[id] ?: throw IllegalArgumentException("There are no such sequence!")
+        sequences.remove(id)
         var currentPoint: Pair<Node?, Int> = Pair(root, 0)
         do {
             val (node, k) = canonize(currentPoint.first, sequence, currentPoint.second, sequence.size - 2)
