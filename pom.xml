@@ -6,7 +6,7 @@
 
     <groupId>com.suhininalex</groupId>
     <artifactId>suffixtree</artifactId>
-    <version>1.0</version>
+    <version>1.0.2</version>
 
     <properties>
         <kotlin.version>1.1.3</kotlin.version>

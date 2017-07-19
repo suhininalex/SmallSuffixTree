@@ -168,7 +168,11 @@ class SuffixTree<T : Comparable<T>> {
 
     fun getSequence(id: Long): List<T> {
         val sequence = sequences[id] ?: throw IllegalStateException("No such sequence!")
-        return Collections.unmodifiableList<T>(sequence.subList(0, sequence.size - 1) as List<T>)
+        return sequence.subList(0, sequence.size - 1) as List<T> //drop end token
+    }
+
+    fun getFullSequence(id: Long): List<Any> {
+        return sequences[id] ?: throw IllegalStateException("No such sequence!")
     }
 
     override fun toString(): String {
@@ -179,7 +183,7 @@ class SuffixTree<T : Comparable<T>> {
         val sequence = sequences[id] ?: throw IllegalArgumentException("There are no such sequence!")
         val nodes = LinkedList<Node>()
 
-        for (i in 0..sequence.size - 1 - 1) {
+        for (i in 0..sequence.size - 1 - 1) { //drop end token
             nodes.add(canonize(root, sequence, i, sequence.size - 2).first!!)
         }
         return nodes
